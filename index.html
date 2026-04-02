@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎨 Doodle - 創意畫畫題目產生器</title>
+    <title>🎨 Doodle - 舒緩奶油風創意畫畫題目產生器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+JP:wght@400;700&display=swap');
 
         body {
-            background-color: #f8fafc;
+            background-color: #f5f2ed; /* 暖米色背景 */
+            color: #6b665f;
             font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans JP", sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         .kids-title {
@@ -18,180 +21,137 @@
         }
 
         .card {
-            transition: all 0.2s ease;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             background: #ffffff;
-            border: 1px solid #f1f5f9;
+            border: 1px solid #e8e4de;
             min-height: 480px;
         }
 
         .card:hover {
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
-            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -10px rgba(107, 102, 95, 0.1);
+            transform: translateY(-4px);
         }
 
         .fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+            animation: fadeIn 0.6s ease-out forwards;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .jp-text {
             font-family: 'Noto Sans JP', sans-serif;
-            font-weight: 700;
+            font-weight: 500;
         }
 
-        /* 題目項目容器：基礎樣式 */
         .prompt-item {
             border-radius: 12px;
-            padding: 10px 12px;
-            transition: all 0.2s;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
+            transition: all 0.2s;
         }
 
-        /* 數字色塊樣式 */
         .number-badge {
             color: #ffffff;
-            width: 48px; /* 寬度容納撲克牌符號 */
-            height: 32px;
+            width: 54px;
+            height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            font-weight: 900;
-            font-size: 1rem;
+            font-weight: 700;
+            font-size: 0.95rem;
             flex-shrink: 0;
             gap: 2px;
+            letter-spacing: -0.5px;
         }
 
-        /* 低飽和度色系定義 */
-        .theme-A { --theme-color: #e5989b; --bg-color: #fef2f2; } /* 柔粉紅 */
-        .theme-B { --theme-color: #a2d2ff; --bg-color: #f0f7ff; } /* 柔粉藍 */
-        .theme-C { --theme-color: #b7e4c7; --bg-color: #f0fdf4; } /* 柔粉綠 */
-        .theme-D { --theme-color: #ffe5b4; --bg-color: #fffbeb; } /* 柔粉黃 */
-        .theme-E { --theme-color: #ffc8dd; --bg-color: #fff1f2; } /* 柔粉橘紅 */
-        .theme-F { --theme-color: #cdb4db; --bg-color: #faf5ff; } /* 柔粉紫 */
+        /* 舒緩配色系統 */
+        .theme-A { --theme-color: #d9a7a7; --bg-color: #fdf6f6; } /* 柔粉木 */
+        .theme-B { --theme-color: #a7c1d9; --bg-color: #f6f9fd; } /* 靜謐藍 */
+        .theme-C { --theme-color: #a3c49a; --bg-color: #f6faf4; } /* 草本綠 */
+        .theme-D { --theme-color: #d9c5a7; --bg-color: #fdf9f6; } /* 焦糖米 */
+        .theme-E { --theme-color: #c1a7d9; --bg-color: #f9f6fd; } /* 薰衣草灰 */
+        .theme-F { --theme-color: #9abec4; --bg-color: #f4fafb; } /* 冷翠藍 */
 
         .theme-border { border-top-color: var(--theme-color) !important; }
-        .theme-text { color: var(--theme-color) !important; }
+        .theme-text { color: var(--theme-color) !important; filter: brightness(0.85); }
         .theme-item-bg { background-color: var(--bg-color); }
         .theme-badge-bg { background-color: var(--theme-color); }
+
+        .btn-refresh {
+            background-color: #8a8279;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .btn-refresh:hover {
+            background-color: #706961;
+            box-shadow: 0 4px 12px rgba(138, 130, 121, 0.2);
+        }
     </style>
 </head>
-<body class="p-4 md:p-6">
+<body class="p-6 md:p-12">
 
     <div class="max-w-[1800px] mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-            <h1 class="kids-title text-4xl md:text-5xl text-slate-700 flex items-center gap-3">
-                🎨 Doodle
-            </h1>
+        <!-- Header 區塊：已移除副標題，維持左 Logo 右按鈕佈局 -->
+        <header class="flex flex-row justify-between items-center mb-16 gap-4">
+            <div class="flex flex-col items-start">
+                <h1 class="kids-title text-4xl md:text-6xl text-stone-600 flex items-center gap-4">
+                    🎨 Doodle
+                </h1>
+            </div>
             <button 
                 onclick="refreshAll()"
-                class="bg-slate-700 hover:bg-slate-800 text-white text-base font-bold py-3 px-10 rounded-full shadow-sm transform active:scale-95 transition-all"
+                class="btn-refresh text-white text-sm md:text-base font-bold py-3 md:py-4 px-6 md:px-12 rounded-xl md:rounded-2xl transform active:scale-95 transition-all shadow-md"
             >
                 🎲 重置全部題目
             </button>
         </header>
 
-        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-5">
-            <!-- JavaScript 會在此插入卡片 -->
+        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-8">
+            <!-- 卡片由 JavaScript 自動生成 -->
         </div>
     </div>
 
     <script>
-        // 撲克牌點數映射：改為先花色後數字
         const clubIcons = ["♣A", "♣2", "♣3", "♣4", "♣5", "♣6"];
         const heartIcons = ["♥A", "♥2", "♥3", "♥4", "♥5", "♥6"];
 
         const config = [
-            { id: heartIcons[0], theme: "theme-A",
-              pool: [
-                { ch: "西瓜", jp: "スイカ" },
-                { ch: "城堡", jp: "おしろ" },
-                { ch: "漢堡", jp: "ハンバーガー" },
-                { ch: "拉麵", jp: "ラーメン" },
-                { ch: "爆米花", jp: "ポップコーン" },
-                { ch: "壽司", jp: "スシ" },
-                { ch: "草莓", jp: "イチゴ" },
-                { ch: "披薩", jp: "ピザ" },
-                { ch: "蛋糕", jp: "ケーキ" },
-                { ch: "甜甜圈", jp: "ドーナツ" }
-              ]
-            },
-            { id: heartIcons[1], theme: "theme-B",
-              pool: [
-                { ch: "怪獸", jp: "モンスター" },
-                { ch: "星星", jp: "ほし" },
-                { ch: "月亮", jp: "つき" },
-                { ch: "巴士", jp: "バス" },
-                { ch: "土星", jp: "どせい" },
-                { ch: "噴泉", jp: "ふんすい" },
-                { ch: "彗星", jp: "すいせい" },
-                { ch: "黑洞", jp: "ブラックホール" },
-                { ch: "披風", jp: "マント" },
-                { ch: "鋼琴", jp: "ピアノ" }
-              ]
-            },
-            { id: heartIcons[2], theme: "theme-C",
-              pool: [
-                { ch: "獨角獸", jp: "ユニコーン" },
-                { ch: "鱷魚", jp: "ワニ" },
-                { ch: "恐龍", jp: "きょうりゅう" },
-                { ch: "貓咪", jp: "ねこ" },
-                { ch: "小狗", jp: "いぬ" },
-                { ch: "大象", jp: "ぞう" },
-                { ch: "變色龍", jp: "カメレオン" },
-                { ch: "企鵝", jp: "ペンギン" },
-                { ch: "河馬", jp: "カバ" },
-                { ch: "長頸鹿", jp: "キリン" }
-              ]
-            },
-            { id: heartIcons[3], theme: "theme-D",
-              pool: [
-                { ch: "花朵", jp: "はな" },
-                { ch: "山脈", jp: "やま" },
-                { ch: "雨滴", jp: "あめ" },
-                { ch: "迷宮", jp: "めいろ" },
-                { ch: "森林", jp: "もり" },
-                { ch: "蘑菇", jp: "きのこ" },
-                { ch: "太陽", jp: "たいよう" },
-                { ch: "糖果", jp: "キャンディ" },
-                { ch: "雲朵", jp: "くも" },
-                { ch: "樹枝", jp: "えだ" }
-              ]
-            },
-            { id: heartIcons[4], theme: "theme-E",
-              pool: [
-                { ch: "鬧鐘", jp: "とけい" },
-                { ch: "鞋子", jp: "くつ" },
-                { ch: "鉛筆", jp: "えんぴつ" },
-                { ch: "雨傘", jp: "かさ" },
-                { ch: "書本", jp: "ほん" },
-                { ch: "牙刷", jp: "ハブラシ" },
-                { ch: "電視", jp: "テレビ" },
-                { ch: "湯勺", jp: "スプーン" },
-                { ch: "眼鏡", jp: "めがね" },
-                { ch: "氣球", jp: "ふうせん" }
-              ]
-            },
-            { id: heartIcons[5], theme: "theme-F",
-              pool: [
-                { ch: "女王", jp: "じょおう" },
-                { ch: "帽子", jp: "ぼうし" },
-                { ch: "背包", jp: "リュック" },
-                { ch: "手套", jp: "てぶくろ" },
-                { ch: "頭盔", jp: "ヘルメット" },
-                { ch: "寶箱", jp: "たからばこ" },
-                { ch: "靴子", jp: "ブーツ" },
-                { ch: "手錶", jp: "うでどけい" },
-                { ch: "戒指", jp: "ゆびわ" },
-                { ch: "電筒", jp: "ライト" }
-              ]
-            }
+            { id: heartIcons[0], theme: "theme-A", pool: [
+                { ch: "西瓜", jp: "スイカ" }, { ch: "城堡", jp: "おしろ" }, { ch: "漢堡", jp: "ハンバーガー" },
+                { ch: "拉麵", jp: "ラーメン" }, { ch: "爆米花", jp: "ポップコーン" }, { ch: "壽司", jp: "スシ" },
+                { ch: "草莓", jp: "イチゴ" }, { ch: "披薩", jp: "ピザ" }, { ch: "蛋糕", jp: "ケーキ" }, { ch: "甜甜圈", jp: "ドーナツ" }
+            ]},
+            { id: heartIcons[1], theme: "theme-B", pool: [
+                { ch: "怪獸", jp: "モンスター" }, { ch: "星星", jp: "ほし" }, { ch: "月亮", jp: "つき" },
+                { ch: "巴士", jp: "バス" }, { ch: "土星", jp: "どせい" }, { ch: "噴泉", jp: "ふんすい" },
+                { ch: "彗星", jp: "すいせい" }, { ch: "黑洞", jp: "ブラックホール" }, { ch: "披風", jp: "マント" }, { ch: "鋼琴", jp: "ピアノ" }
+            ]},
+            { id: heartIcons[2], theme: "theme-C", pool: [
+                { ch: "獨角獸", jp: "ユニコーン" }, { ch: "鱷魚", jp: "ワニ" }, { ch: "恐龍", jp: "きょうりゅう" },
+                { ch: "貓咪", jp: "ねこ" }, { ch: "小狗", jp: "いぬ" }, { ch: "大象", jp: "ぞう" },
+                { ch: "變色龍", jp: "カメレオン" }, { ch: "企鵝", jp: "ペンギン" }, { ch: "河馬", jp: "カバ" }, { ch: "長頸鹿", jp: "キリン" }
+            ]},
+            { id: heartIcons[3], theme: "theme-D", pool: [
+                { ch: "花朵", jp: "はな" }, { ch: "山脈", jp: "やま" }, { ch: "雨滴", jp: "あめ" },
+                { ch: "迷宮", jp: "めいろ" }, { ch: "森林", jp: "もり" }, { ch: "蘑菇", jp: "きのこ" },
+                { ch: "太陽", jp: "たいよう" }, { ch: "糖果", jp: "キャンディ" }, { ch: "雲朵", jp: "くも" }, { ch: "樹枝", jp: "えだ" }
+            ]},
+            { id: heartIcons[4], theme: "theme-E", pool: [
+                { ch: "鬧鐘", jp: "とけい" }, { ch: "鞋子", jp: "くつ" }, { ch: "鉛筆", jp: "えんぴつ" },
+                { ch: "雨傘", jp: "かさ" }, { ch: "書本", jp: "ほん" }, { ch: "牙刷", jp: "ハブラシ" },
+                { ch: "電視", jp: "テレビ" }, { ch: "湯勺", jp: "スプーン" }, { ch: "眼鏡", jp: "めがね" }, { ch: "氣球", jp: "ふうせん" }
+            ]},
+            { id: heartIcons[5], theme: "theme-F", pool: [
+                { ch: "女王", jp: "じょおう" }, { ch: "帽子", jp: "ぼうし" }, { ch: "背包", jp: "リュック" },
+                { ch: "手套", jp: "てぶくろ" }, { ch: "頭盔", jp: "ヘルメット" }, { ch: "寶箱", jp: "たからばこ" },
+                { ch: "靴子", jp: "ブーツ" }, { ch: "手錶", jp: "うでどけい" }, { ch: "戒指", jp: "ゆびわ" }, { ch: "電筒", jp: "ライト" }
+            ]}
         ];
 
         function shuffle(array) {
@@ -203,18 +163,16 @@
             const topics = shuffle([...group.pool]).slice(0, 6);
             
             const card = document.createElement('div');
-            card.className = `card border-t-8 theme-border ${group.theme} rounded-2xl p-5 fade-in relative flex flex-col`;
+            card.className = `card border-t-[10px] theme-border ${group.theme} rounded-[32px] p-7 fade-in relative flex flex-col`;
             card.id = `group-${index}`;
 
             const header = `
-                <div class="flex justify-between items-center mb-6 px-1">
-                    <div class="flex items-center gap-3">
-                        <span class="text-3xl font-black theme-text">${group.id}</span>
-                    </div>
+                <div class="flex justify-between items-center mb-8">
+                    <span class="text-3xl font-black theme-text tracking-tighter">${group.id}</span>
                     <button 
                         onclick="refreshOne(${index})"
-                        class="text-slate-200 hover:text-slate-400 transition-colors text-2xl font-bold"
-                        title="更換此組"
+                        class="text-stone-200 hover:text-stone-400 transition-colors text-2xl"
+                        title="換一組"
                     >
                         ↻
                     </button>
@@ -222,13 +180,13 @@
             `;
 
             const list = `
-                <div class="flex flex-col gap-3 flex-grow">
+                <div class="flex flex-col gap-4 flex-grow">
                     ${topics.map((t, i) => `
                         <div class="prompt-item theme-item-bg">
                             <div class="number-badge theme-badge-bg">${clubIcons[i]}</div>
-                            <div class="flex flex-wrap items-center gap-x-3 gap-y-0">
-                                <span class="text-lg font-bold text-slate-700">${t.ch}</span>
-                                <span class="jp-text text-lg text-slate-500">${t.jp}</span>
+                            <div class="flex flex-col">
+                                <span class="text-lg font-bold text-stone-600 leading-tight">${t.ch}</span>
+                                <span class="jp-text text-sm text-stone-400 mt-0.5">${t.jp}</span>
                             </div>
                         </div>
                     `).join('')}
