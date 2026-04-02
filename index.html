@@ -56,15 +56,16 @@
         /* 數字色塊樣式 */
         .number-badge {
             color: #ffffff;
-            width: 32px;
+            width: 48px; /* 寬度容納撲克牌符號 */
             height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 8px;
             font-weight: 900;
-            font-size: 1.1rem;
+            font-size: 1rem;
             flex-shrink: 0;
+            gap: 2px;
         }
 
         /* 低飽和度色系定義 */
@@ -92,7 +93,7 @@
                 onclick="refreshAll()"
                 class="bg-slate-700 hover:bg-slate-800 text-white text-base font-bold py-3 px-10 rounded-full shadow-sm transform active:scale-95 transition-all"
             >
-                🎲 重置 A-F 全部題目
+                🎲 重置全部題目
             </button>
         </header>
 
@@ -102,8 +103,12 @@
     </div>
 
     <script>
+        // 撲克牌點數映射：改為先花色後數字
+        const clubIcons = ["♣A", "♣2", "♣3", "♣4", "♣5", "♣6"];
+        const heartIcons = ["♥A", "♥2", "♥3", "♥4", "♥5", "♥6"];
+
         const config = [
-            { id: "A", theme: "theme-A",
+            { id: heartIcons[0], theme: "theme-A",
               pool: [
                 { ch: "西瓜", jp: "スイカ" },
                 { ch: "城堡", jp: "おしろ" },
@@ -117,7 +122,7 @@
                 { ch: "甜甜圈", jp: "ドーナツ" }
               ]
             },
-            { id: "B", theme: "theme-B",
+            { id: heartIcons[1], theme: "theme-B",
               pool: [
                 { ch: "怪獸", jp: "モンスター" },
                 { ch: "星星", jp: "ほし" },
@@ -131,7 +136,7 @@
                 { ch: "鋼琴", jp: "ピアノ" }
               ]
             },
-            { id: "C", theme: "theme-C",
+            { id: heartIcons[2], theme: "theme-C",
               pool: [
                 { ch: "獨角獸", jp: "ユニコーン" },
                 { ch: "鱷魚", jp: "ワニ" },
@@ -145,7 +150,7 @@
                 { ch: "長頸鹿", jp: "キリン" }
               ]
             },
-            { id: "D", theme: "theme-D",
+            { id: heartIcons[3], theme: "theme-D",
               pool: [
                 { ch: "花朵", jp: "はな" },
                 { ch: "山脈", jp: "やま" },
@@ -159,7 +164,7 @@
                 { ch: "樹枝", jp: "えだ" }
               ]
             },
-            { id: "E", theme: "theme-E",
+            { id: heartIcons[4], theme: "theme-E",
               pool: [
                 { ch: "鬧鐘", jp: "とけい" },
                 { ch: "鞋子", jp: "くつ" },
@@ -173,7 +178,7 @@
                 { ch: "氣球", jp: "ふうせん" }
               ]
             },
-            { id: "F", theme: "theme-F",
+            { id: heartIcons[5], theme: "theme-F",
               pool: [
                 { ch: "女王", jp: "じょおう" },
                 { ch: "帽子", jp: "ぼうし" },
@@ -220,7 +225,7 @@
                 <div class="flex flex-col gap-3 flex-grow">
                     ${topics.map((t, i) => `
                         <div class="prompt-item theme-item-bg">
-                            <div class="number-badge theme-badge-bg">${i + 1}</div>
+                            <div class="number-badge theme-badge-bg">${clubIcons[i]}</div>
                             <div class="flex flex-wrap items-center gap-x-3 gap-y-0">
                                 <span class="text-lg font-bold text-slate-700">${t.ch}</span>
                                 <span class="jp-text text-lg text-slate-500">${t.jp}</span>
