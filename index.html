@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎨 創意畫畫題目產生器</title>
+    <title>🎨 Doodle - 創意畫畫題目產生器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+JP:wght@400;700&display=swap');
 
         body {
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
             font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans JP", sans-serif;
         }
 
@@ -21,11 +21,11 @@
             transition: all 0.2s ease;
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            min-height: 520px;
+            min-height: 480px;
         }
 
         .card:hover {
-            box-shadow: 0 12px 20px -10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1);
         }
 
         .fade-in {
@@ -39,26 +39,38 @@
 
         .jp-text {
             font-family: 'Noto Sans JP', sans-serif;
-            font-weight: 500;
+            font-weight: 700;
+        }
+
+        /* 讓中日文包在一起的視覺樣式 */
+        .prompt-item {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 10px 12px;
+            transition: background-color 0.2s;
+        }
+
+        .prompt-item:hover {
+            background-color: #f1f5f9;
         }
     </style>
 </head>
 <body class="p-4 md:p-6">
 
     <div class="max-w-[1800px] mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <h1 class="kids-title text-3xl md:text-4xl text-slate-800 flex items-center gap-2">
-                🎨 畫畫靈感實驗室
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+            <h1 class="kids-title text-4xl md:text-5xl text-indigo-900 flex items-center gap-3">
+                🎨 Doodle
             </h1>
             <button 
                 onclick="refreshAll()"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold py-2.5 px-8 rounded-lg shadow-sm transform active:scale-95 transition-all"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold py-3 px-10 rounded-full shadow-md transform active:scale-95 transition-all"
             >
-                🎲 重置全部 A-F 組
+                🎲 重置 A-F 全部題目
             </button>
         </header>
 
-        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-5">
             <!-- JavaScript 會在此插入卡片 -->
         </div>
     </div>
@@ -160,18 +172,18 @@
             const topics = shuffle([...group.pool]).slice(0, 6);
             
             const card = document.createElement('div');
-            card.className = `card border-t-4 ${group.color} rounded-xl p-5 shadow-sm fade-in relative flex flex-col`;
+            card.className = `card border-t-8 ${group.color} rounded-2xl p-5 shadow-sm fade-in relative flex flex-col`;
             card.id = `group-${index}`;
 
             const header = `
-                <div class="flex justify-between items-center mb-6">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xl font-black ${group.titleColor}">Group ${group.id}</span>
-                        <span class="text-lg opacity-80">${group.icon}</span>
+                <div class="flex justify-between items-center mb-6 px-1">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl font-black ${group.titleColor}">${group.id}</span>
+                        <span class="text-xl opacity-60">${group.icon}</span>
                     </div>
                     <button 
                         onclick="refreshOne(${index})"
-                        class="text-slate-300 hover:text-indigo-600 transition-colors text-xl font-bold"
+                        class="text-slate-300 hover:text-indigo-600 transition-colors text-2xl font-bold"
                         title="更換此組"
                     >
                         ↻
@@ -180,13 +192,13 @@
             `;
 
             const list = `
-                <div class="flex flex-col gap-6 flex-grow">
+                <div class="flex flex-col gap-3 flex-grow">
                     ${topics.map((t, i) => `
-                        <div class="flex items-start gap-2">
-                            <span class="text-sm font-bold text-slate-300 mt-1.5">${i + 1}.</span>
-                            <div class="flex flex-col">
-                                <span class="text-lg font-bold text-slate-800 leading-tight">${t.ch}</span>
-                                <span class="jp-text text-sm text-indigo-500 mt-1">${t.jp}</span>
+                        <div class="prompt-item flex items-center gap-3">
+                            <span class="text-xs font-black text-slate-400 w-4">${i + 1}</span>
+                            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0">
+                                <span class="text-lg font-bold text-slate-800">${t.ch}</span>
+                                <span class="jp-text text-sm text-indigo-500">${t.jp}</span>
                             </div>
                         </div>
                     `).join('')}
