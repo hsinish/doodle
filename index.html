@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>♣️ Doodle - 撲克牌畫畫題目產生器</title>
+    <title>♣️ Doodle - 繪圖題目產生器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 引入手寫字體 Permanent Marker */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;700&family=Noto+Serif+TC:wght@900&family=Permanent+Marker&display=swap');
 
         :root {
@@ -26,28 +25,34 @@
             overflow-x: hidden;
         }
 
-        .poker-serif {
-            font-family: 'Noto Serif TC', serif;
-        }
+        .poker-serif { font-family: 'Noto Serif TC', serif; }
+        .handwritten-title { font-family: 'Permanent Marker', cursive; }
 
-        /* 手寫風格標題字體 */
-        .handwritten-title {
-            font-family: 'Permanent Marker', cursive;
+        .settings-modal {
+            display: none;
+            position: absolute;
+            top: 55px;
+            right: 0;
+            width: 340px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            padding: 1.5rem;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
         }
+        
+        .settings-modal.active { display: block; }
 
         .card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: var(--card-bg);
-            /* 微調最小高度，確保在平板上也能一次看完 */
             min-height: 420px; 
             position: relative;
             overflow: hidden;
-            padding-left: 3rem !important;
-            padding-right: 3rem !important;
-        }
-
-        @media (min-height: 800px) {
-            .card { min-height: 480px; }
+            padding: 3rem 2.5rem 2rem 2.5rem !important;
         }
 
         .card:hover {
@@ -55,64 +60,29 @@
             box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        .text-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            line-height: 1.1;
-        }
-
-        .ch-text {
-            font-weight: 700;
-            font-size: clamp(0.85rem, 1.1vw, 1.05rem);
-            color: #1a1a1a;
-            margin-bottom: 1px;
-        }
-
-        .jp-text {
-            font-family: 'Noto Sans JP', sans-serif;
-            font-weight: 300;
-            font-size: clamp(0.75rem, 1vw, 0.9rem);
-            color: #4b5563;
         }
 
         .prompt-item {
             background-color: var(--item-bg);
-            padding: 8px 12px; 
+            padding: 10px 12px; 
             display: flex;
             align-items: center;
             gap: 12px;
             border-radius: 10px;
-            margin-bottom: 4px; /* 稍微縮小間距 */
-            transition: background-color 0.2s;
+            margin-bottom: 6px;
+            transition: all 0.2s ease;
             width: 100%;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
         
-        .prompt-item:hover {
-            background-color: var(--item-hover);
-        }
-
-        .heart-red {
-            color: var(--poker-red);
-        }
-
-        .btn-refresh {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            transition: all 0.2s;
-        }
-        .btn-refresh:hover {
-            background-color: #404040;
-        }
+        .prompt-item:active { transform: scale(0.96); }
+        .heart-red { color: var(--poker-red); }
 
         .club-grid {
             width: 32px;
@@ -124,7 +94,9 @@
             background: #ffffff;
             border-radius: 4px;
             padding: 2px;
+            pointer-events: none;
         }
+        
         .club-symbol {
             font-size: 9px;
             color: #000000;
@@ -142,151 +114,364 @@
             line-height: 0.85;
             font-weight: 900;
             z-index: 10;
+            pointer-events: none;
         }
         .corner-top { top: 8px; left: 8px; }
-        .corner-bottom { 
-            bottom: 8px; 
-            right: 8px; 
-            transform: rotate(180deg); 
+        .corner-bottom { bottom: 8px; right: 8px; transform: rotate(180deg); }
+
+        .reset-card-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #f3f4f6;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 30;
+            color: #9ca3af;
+        }
+        .reset-card-btn:hover {
+            background: #e5e7eb;
+            color: #000;
+            transform: rotate(90deg);
         }
 
-        .options-wrapper {
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-            width: 100%;
-            padding: 0 0.5rem;
+        .lang-btn {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            text-align: center;
+            transition: all 0.2s;
+            background: #f9fafb;
+            font-weight: 500;
         }
+        .lang-btn.active { background: #000; color: #fff; border-color: #000; }
 
-        @media (max-width: 1280px) {
-            .card { 
-                padding-left: 2.2rem !important; 
-                padding-right: 2.2rem !important; 
-            }
-            .options-wrapper { padding: 0; }
+        .item-mask {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 10;
         }
+        .prompt-item:hover .item-mask { opacity: 1; }
     </style>
 </head>
 <body class="p-4 lg:p-8">
 
     <div class="max-w-[1920px] mx-auto">
-        <header class="flex flex-row justify-between items-center mb-6">
-            <!-- 縮小標題字體大小，從 text-4xl/6xl 改為 text-2xl/4xl -->
-            <h1 class="handwritten-title text-2xl md:text-4xl text-black tracking-widest">
+        <header class="flex flex-row justify-between items-center mb-8">
+            <h1 class="handwritten-title text-3xl md:text-5xl text-black tracking-widest">
                 ♣ DOODLE ♥
             </h1>
-            <button 
-                onclick="refreshAll()"
-                class="btn-refresh font-bold py-2 px-6 rounded-full transform active:scale-95 shadow-md text-xs md:text-sm"
-            >
-                重置全部
-            </button>
+            
+            <div class="flex items-center gap-3 relative">
+                <button id="settingsToggle" class="bg-white border border-gray-300 px-4 py-2 rounded-full shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors text-sm font-bold">
+                    <span id="ui-settings-btn">⚙️ 設定</span>
+                </button>
+
+                <button id="resetAll" class="bg-black text-white px-6 py-2 rounded-full shadow-md hover:bg-gray-800 transition-all active:scale-95 text-sm font-bold">
+                    <span id="ui-reset-btn">全部重置</span>
+                </button>
+
+                <div id="settingsModal" class="settings-modal shadow-2xl">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h2 id="ui-settings-title" class="text-lg font-bold">遊戲配置</h2>
+                        <button id="closeSettings" class="text-gray-400 hover:text-black">✕</button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <section>
+                            <label id="ui-primary-lang-label" class="block text-xs font-black text-gray-400 mb-2 uppercase">主要語言</label>
+                            <div class="grid grid-cols-3 gap-2" id="primaryLangBtns">
+                                <button data-value="zh" class="lang-btn active">中文</button>
+                                <button data-value="ja" class="lang-btn">日本語</button>
+                                <button data-value="en" class="lang-btn">English</button>
+                            </div>
+                        </section>
+
+                        <section id="secondaryLangSection">
+                            <label id="ui-secondary-lang-label" class="block text-xs font-black text-gray-400 mb-2 uppercase">次要語言</label>
+                            <div class="grid grid-cols-3 gap-2" id="secondaryLangBtns">
+                                <button data-value="zh" class="lang-btn">中文</button>
+                                <button data-value="ja" class="lang-btn active">日本語</button>
+                                <button data-value="en" class="lang-btn">English</button>
+                                <button data-value="none" class="lang-btn col-span-3">無</button>
+                            </div>
+                        </section>
+
+                        <section>
+                            <label id="ui-difficulty-label" class="block text-xs font-black text-gray-400 uppercase mb-2">題目難度</label>
+                            <select id="difficulty" class="w-full border border-gray-200 rounded-lg p-2 text-sm bg-gray-50">
+                                <option value="easy" selected id="ui-diff-easy">簡單 (日常小物)</option>
+                                <option value="medium" id="ui-diff-medium">中等 (職業與場景)</option>
+                                <option value="hard" id="ui-diff-hard">困難 (抽象概念)</option>
+                            </select>
+                        </section>
+
+                        <section class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label id="ui-group-count-label" class="block text-xs font-black text-gray-400 mb-1">群組 (3-13)</label>
+                                <input type="number" id="groupCount" min="3" max="13" value="6" class="w-full border border-gray-200 rounded-lg p-2 text-sm bg-gray-50">
+                            </div>
+                            <div>
+                                <label id="ui-option-count-label" class="block text-xs font-black text-gray-400 mb-1">選項 (3-13)</label>
+                                <input type="number" id="optionCount" min="3" max="13" value="6" class="w-full border border-gray-200 rounded-lg p-2 text-sm bg-gray-50">
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="flex gap-2 mt-8 pt-4 border-t">
+                        <button id="resetToDefault" class="flex-1 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm font-bold transition-colors">
+                            <span id="ui-settings-reset">重置</span>
+                        </button>
+                        <button id="saveSettings" class="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 text-sm font-bold transition-colors shadow-lg">
+                            <span id="ui-settings-save">儲存</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </header>
 
-        <!-- 調整 Grid 佈局：md(平板) 設為 3 欄，xl(桌面) 設為 6 欄 -->
-        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 lg:gap-4">
-            <!-- 由 JS 生成 -->
-        </div>
+        <div id="gameContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4"></div>
     </div>
 
     <script>
-        const clubLayouts = {
-            1: [4],
-            2: [1, 7],
-            3: [1, 4, 7],
-            4: [0, 2, 6, 8],
-            5: [0, 2, 4, 6, 8],
-            6: [0, 2, 3, 5, 6, 8]
+        const uiTranslations = {
+            zh: { settings: "⚙️ 設定", resetAll: "全部重置", configTitle: "遊戲配置", primary: "主要語言", secondary: "次要語言", difficulty: "題目難度", easy: "簡單 (日常小物)", medium: "中等 (職業與場景)", hard: "困難 (抽象概念)", reset: "重置", save: "儲存" },
+            en: { settings: "⚙️ Settings", resetAll: "Reset All", configTitle: "Configuration", primary: "Primary Language", secondary: "Secondary Language", difficulty: "Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", reset: "Reset", save: "Save" },
+            ja: { settings: "⚙️ 設定", resetAll: "すべてリセット", configTitle: "ゲーム設定", primary: "主要言語", secondary: "次要言語", difficulty: "難易度", easy: "かんたん", medium: "ふつう", hard: "むずかしい", reset: "リセット", save: "保存" }
         };
 
-        const heartIds = ["A", "2", "3", "4", "5", "6"];
+        // 嚴格對齊索引資料庫
+        const dictionary = {
+            zh: {
+                easy: ["西瓜", "城堡", "漢堡", "拉麵", "壽司", "草莓", "披薩", "蛋糕", "甜甜圈", "貓咪", "太陽", "雨傘", "熱氣球", "迷宮", "冰淇淋", "自行車", "電視", "相機", "帽子", "眼鏡", "書本", "星星", "香蕉", "飛機", "輪船", "火車", "手錶", "沙發", "電燈", "蘋果", "梨子", "鳳梨", "月亮", "雲朵", "氣球", "桌子", "椅子", "風扇", "冰箱", "麵包", "雞蛋", "牛奶", "果汁", "鉛筆", "書包", "雨靴", "圍巾", "手套", "風箏", "貝殼", "企鵝", "蝴蝶", "向日葵", "彩虹", "吉他", "鬧鐘", "牙刷", "梳子", "毛巾", "拖鞋", "餅乾", "巧克力", "大象", "長頸鹿", "獅子", "海龜", "螃蟹", "消防栓"],
+                medium: ["消防員", "太空人", "圖書館員", "鋼琴家", "水底城市", "森林火災", "機器人", "古堡", "直升機", "顯微鏡", "交響樂隊", "實驗室", "古埃及", "時光機", "廚師", "偵探", "醫生", "畫家", "廢墟", "工廠", "大橋", "馬戲團", "遊樂園", "深海魚", "極光", "太空站", "考古學家", "魔術師", "滑雪場", "金字塔", "空中花園", "龍捲風", "火山爆發", "海底隧道", "太空漫步"],
+                hard: ["寂寞的靈魂", "崩塌的維度", "賽博龐克之夜", "蒸汽龐克工廠", "時間的流逝", "多重宇宙碎片", "虛無", "遺忘的記憶", "重力的背叛", "希望的微光", "夢境入口", "混沌", "永恆", "破碎鏡像", "靈光乍現", "沈默迴響", "平衡藝術", "光影對話", "靈魂共振", "存在的意義", "命運線索", "恐懼形狀", "喜悅顏色", "憤怒火焰", "寧靜海洋", "智慧泉源", "勇氣試煉", "孤獨旅者", "時空扭曲", "記憶迷宮"],
+                labels: ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+            },
+            en: {
+                easy: ["Watermelon", "Castle", "Burger", "Ramen", "Sushi", "Strawberry", "Pizza", "Cake", "Donut", "Cat", "Sun", "Umbrella", "Balloon", "Maze", "Ice Cream", "Bike", "TV", "Camera", "Hat", "Glasses", "Book", "Star", "Banana", "Plane", "Ship", "Train", "Watch", "Sofa", "Lamp", "Apple", "Pear", "Pineapple", "Moon", "Cloud", "Balloon", "Table", "Chair", "Fan", "Fridge", "Bread", "Egg", "Milk", "Juice", "Pencil", "Backpack", "Boots", "Scarf", "Gloves", "Kite", "Shell", "Penguin", "Butterfly", "Sunflower", "Rainbow", "Guitar", "Alarm", "Toothbrush", "Comb", "Towel", "Slippers", "Cookies", "Chocolate", "Elephant", "Giraffe", "Lion", "Turtle", "Crab", "Hydrant"],
+                medium: ["Firefighter", "Astronaut", "Librarian", "Pianist", "Underwater City", "Forest Fire", "Robot", "Castle", "Helicopter", "Microscope", "Orchestra", "Lab", "Ancient Egypt", "Time Machine", "Chef", "Detective", "Doctor", "Painter", "Ruins", "Factory", "Bridge", "Circus", "Amusement Park", "Deep Sea Fish", "Aurora", "Space Station", "Archaeologist", "Magician", "Ski Resort", "Pyramid", "Hanging Garden", "Tornado", "Volcano", "Underwater Tunnel", "Spacewalk"],
+                hard: ["Lonely Soul", "Collapsing Dimension", "Cyberpunk Night", "Steampunk Factory", "Time Flow", "Multiverse Shards", "Void", "Forgotten Memory", "Gravity Betrayal", "Glimmer of Hope", "Dream Entrance", "Chaos", "Eternity", "Shattered Mirror", "Sudden Inspiration", "Silent Echo", "Art of Balance", "Light and Shadow", "Resonance", "Meaning of Existence", "Fate Clue", "Shape of Fear", "Color of Joy", "Fire of Anger", "Ocean of Serenity", "Fountain of Wisdom", "Trial of Courage", "Lonely Traveler", "Space Distortion", "Memory Maze"],
+                labels: ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+            },
+            ja: {
+                easy: ["スイカ", "おしろ", "ハンバーガー", "ラーメン", "スシ", "イチゴ", "ピザ", "ケーキ", "ドーナツ", "ねこ", "たいよう", "かさ", "ききゅう", "めいろ", "アイス", "じてんしゃ", "テレビ", "カメラ", "ぼうし", "めがね", "ほん", "ほし", "バナナ", "ひこうき", "ふね", "でんしゃ", "うでどけい", "ソファ", "でんきゅう", "りんご", "なし", "パイナップル", "つき", "くも", "ふうせん", "つくえ", "いす", "せんぷうき", "れいぞうこ", "パン", "たまご", "ぎゅうにゅう", "ジュース", "えんぴつ", "かばん", "ながぐつ", "マフラー", "てぶくろ", "たこ", "かいがら", "ペンギン", "ちょうちょ", "ひまわり", "にじ", "ギター", "めざまし", "はぶらし", "くし", "タオル", "スリッパ", "クッキー", "チョコレート", "ぞう", "きりん", "らいおん", "かめ", "かに", "しょうぼうせん"],
+                medium: ["しょうぼうし", "うちゅうひこうし", "ししょ", "ピアニスト", "かいていとし", "しんりんかさい", "ロボット", "こじょう", "ヘリコプター", "けんびきょう", "オーケストラ", "じっけんしつ", "こだいエジプト", "タイムマシン", "シェフ", "たんてい", "いしゃ", "がか", "はいきょ", "こうじょう", "おおはし", "サーカス", "ゆうえんち", "しんかいぎょ", "オーロラ", "うちゅうステーション", "こうこがくしゃ", "てじなし", "スキーじょう", "ピラミッド", "くうちゅうていえん", "たつまき", "かざんばくはつ", "かいていとんねる", "うちゅうゆうえん"],
+                hard: ["こどくなたましい", "ほうかいするじげん", "サイバーパンクのよる", "スチームパンクこうじょう", "じかんのけいか", "マルチバースのだんぺん", "きょむ", "わすれられたきおく", "じゅうりょくのうらぎり", "きぼうのひかり", "ゆめのいりぐち", "カオス", "えいえん", "われたかがみ", "ひらめき", "しずかなひびき", "ばらんすのじゅつ", "ひかりとかげ", "きょうめい", "そんざいいぎ", "うんめいのてがかり", "きょうふのかたち", "よろこびのいろ", "いかりのほのお", "せいじゃくのうみ", "ちえのいずみ", "ゆうきのしれん", "こどくなたびびと", "じくうのゆがみ", "きおくのめいろ"],
+                labels: ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+            }
+        };
 
-        const config = [
-            { id: heartIds[0], pool: [{ ch: "西瓜", jp: "スイカ" }, { ch: "城堡", jp: "おしろ" }, { ch: "漢堡", jp: "ハンバーガー" }, { ch: "拉麵", jp: "ラーメン" }, { ch: "爆米花", jp: "ポップコーン" }, { ch: "壽司", jp: "スシ" }, { ch: "草莓", jp: "イチゴ" }, { ch: "披薩", jp: "ピザ" }, { ch: "蛋糕", jp: "ケーキ" }, { ch: "甜甜圈", jp: "ドーナツ" }] },
-            { id: heartIds[1], pool: [{ ch: "怪獸", jp: "モンスター" }, { ch: "星星", jp: "ほし" }, { ch: "月亮", jp: "つき" }, { ch: "巴士", jp: "バス" }, { ch: "土星", jp: "どせい" }, { ch: "噴泉", jp: "ふんすい" }, { ch: "彗星", jp: "すいせい" }, { ch: "黑洞", jp: "ブラックホール" }, { ch: "披風", jp: "マント" }, { ch: "鋼琴", jp: "ピアノ" }] },
-            { id: heartIds[2], pool: [{ ch: "獨角獸", jp: "ユニコーン" }, { ch: "鱷魚", jp: "ワニ" }, { ch: "恐龍", jp: "きょうりゅう" }, { ch: "貓咪", jp: "ねこ" }, { ch: "小狗", jp: "いぬ" }, { ch: "大象", jp: "ぞう" }, { ch: "變色龍", jp: "カメレオン" }, { ch: "企鵝", jp: "ペンギン" }, { ch: "河馬", jp: "カバ" }, { ch: "長頸鹿", jp: "キリン" }] },
-            { id: heartIds[3], pool: [{ ch: "花朵", jp: "はな" }, { ch: "山脈", jp: "やま" }, { ch: "雨滴", jp: "あめ" }, { ch: "迷宮", jp: "めいろ" }, { ch: "森林", jp: "もり" }, { ch: "蘑菇", jp: "きのこ" }, { ch: "太陽", jp: "たいよう" }, { ch: "糖果", jp: "キャンディ" }, { ch: "雲朵", jp: "くも" }, { ch: "樹枝", jp: "えだ" }] },
-            { id: heartIds[4], pool: [{ ch: "鬧鐘", jp: "とけい" }, { ch: "鞋子", jp: "くつ" }, { ch: "鉛筆", jp: "えんぴつ" }, { ch: "雨傘", jp: "かさ" }, { ch: "書本", jp: "ほん" }, { ch: "牙刷", jp: "ハブラシ" }, { ch: "電視", jp: "テレビ" }, { ch: "湯勺", jp: "スプーン" }, { ch: "眼鏡", jp: "めがね" }, { ch: "氣球", jp: "ふうせん" }] },
-            { id: heartIds[5], pool: [{ ch: "女王", jp: "じょおう" }, { ch: "帽子", jp: "ぼうし" }, { ch: "背包", jp: "リュック" }, { ch: "手套", jp: "てぶくろ" }, { ch: "頭盔", jp: "ヘルメット" }, { ch: "寶箱", jp: "たからばこ" }, { ch: "靴子", jp: "ブーツ" }, { ch: "手錶", jp: "うでどけい" }, { ch: "戒指", jp: "ゆびわ" }, { ch: "電筒", jp: "ライト" }] }
-        ];
+        const clubLayouts = { 1:[4], 2:[1, 7], 3:[1, 4, 7], 4:[0, 2, 6, 8], 5:[0, 2, 4, 6, 8], 6:[0, 2, 3, 5, 6, 8], 7:[0, 2, 3, 4, 5, 6, 8], 8:[0, 1, 2, 3, 5, 6, 7, 8], 9:[0, 1, 2, 3, 4, 5, 6, 7, 8], 10:[0, 1, 2, 3, 4, 5, 6, 7, 8, 4], 11:[0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 7], 12:[0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 4, 7], 13:[0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 2, 6, 8] };
+
+        let currentConfig = { primary: 'zh', secondary: 'ja', difficulty: 'easy', groups: 6, options: 6 };
+        let currentlyUsedIndices = [];
+
+        function updateUIStrings() {
+            const t = uiTranslations[currentConfig.primary] || uiTranslations.zh;
+            document.getElementById('ui-settings-btn').innerText = t.settings;
+            document.getElementById('ui-reset-btn').innerText = t.resetAll;
+            document.getElementById('ui-settings-title').innerText = t.configTitle;
+            document.getElementById('ui-primary-lang-label').innerText = t.primary;
+            document.getElementById('ui-secondary-lang-label').innerText = t.secondary;
+            document.getElementById('ui-difficulty-label').innerText = t.difficulty;
+            document.getElementById('ui-diff-easy').innerText = t.easy;
+            document.getElementById('ui-diff-medium').innerText = t.medium;
+            document.getElementById('ui-diff-hard').innerText = t.hard;
+            document.getElementById('ui-group-count-label').innerText = t.groupLabel;
+            document.getElementById('ui-option-count-label').innerText = t.optionLabel;
+            document.getElementById('ui-settings-reset').innerText = t.reset;
+            document.getElementById('ui-settings-save').innerText = t.save;
+        }
 
         function getClubBadge(num) {
-            const layout = clubLayouts[num];
+            const layout = clubLayouts[num] || [4];
             let cells = Array(9).fill('');
-            layout.forEach(idx => cells[idx] = '♣');
-            
-            return `
-                <div class="club-grid">
-                    ${cells.map(cell => `<div class="club-symbol">${cell}</div>`).join('')}
-                </div>
-            `;
+            layout.slice(0, 9).forEach(idx => cells[idx] = '♣');
+            return `<div class="club-grid">${cells.map(cell => `<div class="club-symbol">${cell}</div>`).join('')}</div>`;
         }
 
-        function shuffle(array) {
-            return array.sort(() => Math.random() - 0.5);
+        // 核心同步取值邏輯：根據索引從各語言字典取值
+        function getSyncValues(poolIdx) {
+            const diff = currentConfig.difficulty;
+            const primaryVal = dictionary[currentConfig.primary][diff][poolIdx] || "???";
+            let secondaryVal = "";
+            if (currentConfig.secondary !== 'none') {
+                secondaryVal = dictionary[currentConfig.secondary][diff][poolIdx] || "";
+            }
+            return { primaryVal, secondaryVal };
         }
 
-        function generateCard(index) {
-            const group = config[index];
-            const topics = shuffle([...group.pool]).slice(0, 6);
-            
+        function createCard(i, initialIndices) {
+            const cardId = dictionary[currentConfig.primary].labels[i] || (i + 1).toString();
             const card = document.createElement('div');
-            card.className = `card rounded-xl fade-in flex flex-col justify-center`;
-            card.id = `group-${index}`;
+            card.className = `card rounded-2xl shadow-sm fade-in flex flex-col justify-center`;
+            
+            const resetBtn = document.createElement('div');
+            resetBtn.className = 'reset-card-btn';
+            resetBtn.innerHTML = '↻';
+            resetBtn.onclick = (e) => { e.stopPropagation(); refreshCardContent(card, i, true); };
 
-            const cornerHTML = `
+            card.innerHTML = `
                 <div class="poker-corner corner-top heart-red">
-                    <span class="text-3xl poker-serif font-black">${group.id}</span>
-                    <span class="text-xl">♥</span>
+                    <span class="text-2xl poker-serif font-black">${cardId}</span>
+                    <span class="text-lg">♥</span>
                 </div>
                 <div class="poker-corner corner-bottom heart-red">
-                    <span class="text-3xl poker-serif font-black">${group.id}</span>
-                    <span class="text-xl">♥</span>
+                    <span class="text-2xl poker-serif font-black">${cardId}</span>
+                    <span class="text-lg">♥</span>
                 </div>
             `;
+            card.appendChild(resetBtn);
+            
+            const listWrapper = document.createElement('div');
+            listWrapper.className = 'flex flex-col space-y-1 z-20 list-wrapper';
+            card.appendChild(listWrapper);
 
-            const refreshBtn = `
-                <button 
-                    onclick="refreshOne(${index})"
-                    class="absolute top-3 right-3 text-gray-200 hover:text-black transition-colors z-20"
-                >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                </button>
-            `;
-
-            const list = `
-                <div class="options-wrapper flex flex-col space-y-1">
-                    ${topics.map((t, i) => `
-                        <div class="prompt-item">
-                            ${getClubBadge(i + 1)}
-                            <div class="text-container">
-                                <span class="ch-text">${t.ch}</span>
-                                <span class="jp-text">${t.jp}</span>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-
-            card.innerHTML = cornerHTML + refreshBtn + list;
+            refreshCardContent(card, i, false, initialIndices);
             return card;
         }
 
-        function refreshOne(index) {
-            const grid = document.getElementById('grid');
-            const oldCard = document.getElementById(`group-${index}`);
-            const newCard = generateCard(index);
-            grid.replaceChild(newCard, oldCard);
+        function refreshCardContent(cardEl, cardPos, isSingleCardReset = false, preCalculatedIndices = null) {
+            const wrapper = cardEl.querySelector('.list-wrapper');
+            wrapper.innerHTML = '';
+            
+            const diff = currentConfig.difficulty;
+            const poolLength = dictionary[currentConfig.primary][diff].length;
+
+            let indices = [];
+            if (preCalculatedIndices) {
+                indices = preCalculatedIndices;
+            } else if (isSingleCardReset) {
+                const cardStartIdx = cardPos * currentConfig.options;
+                const othersUsed = currentlyUsedIndices.filter((_, idx) => idx < cardStartIdx || idx >= (cardStartIdx + currentConfig.options));
+
+                let available = [];
+                for(let k=0; k < poolLength; k++) if (!othersUsed.includes(k)) available.push(k);
+
+                const source = available.length >= currentConfig.options ? available : [...Array(poolLength).keys()];
+                indices = source.sort(() => Math.random() - 0.5).slice(0, currentConfig.options);
+                currentlyUsedIndices.splice(cardStartIdx, currentConfig.options, ...indices);
+            }
+
+            indices.forEach((poolIdx, displayIdx) => {
+                const { primaryVal, secondaryVal } = getSyncValues(poolIdx);
+                addPromptItem(wrapper, primaryVal, secondaryVal, displayIdx, cardPos);
+            });
         }
 
-        function refreshAll() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
-            for (let i = 0; i < config.length; i++) {
-                grid.appendChild(generateCard(i));
+        function addPromptItem(wrapper, primary, secondary, optIdx, cardPos) {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'prompt-item group';
+            itemEl.innerHTML = `
+                ${getClubBadge(optIdx + 1)}
+                <div class="flex flex-col leading-tight pointer-events-none">
+                    <span class="font-bold text-sm text-gray-800">${primary}</span>
+                    ${secondary ? `<span class="text-sm text-gray-700 font-light">${secondary}</span>` : ''}
+                </div>
+                <div class="item-mask rounded-lg">
+                    <span class="text-xs font-black text-black bg-white px-3 py-1.5 rounded-full shadow-lg transform translate-y-1 group-hover:translate-y-0 transition-transform duration-200">
+                        更換 ↻
+                    </span>
+                </div>
+            `;
+            itemEl.onclick = (e) => { e.stopPropagation(); replaceSingleItem(itemEl, cardPos, optIdx); };
+            wrapper.appendChild(itemEl);
+        }
+
+        function replaceSingleItem(itemEl, cardPos, optIdx) {
+            const diff = currentConfig.difficulty;
+            const poolLength = dictionary[currentConfig.primary][diff].length;
+            const currentGlobalIdx = cardPos * currentConfig.options + optIdx;
+            const allUsed = currentlyUsedIndices.filter((_, idx) => idx !== currentGlobalIdx);
+            
+            let available = [];
+            for(let k=0; k < poolLength; k++) if (!allUsed.includes(k)) available.push(k);
+            
+            const finalPool = available.length > 0 ? available : [...Array(poolLength).keys()];
+            const newIdx = finalPool[Math.floor(Math.random() * finalPool.length)];
+            
+            currentlyUsedIndices[currentGlobalIdx] = newIdx;
+            const { primaryVal, secondaryVal } = getSyncValues(newIdx);
+            
+            const textContainer = itemEl.querySelector('.flex.flex-col');
+            textContainer.innerHTML = `<span class="font-bold text-sm text-gray-800">${primaryVal}</span>${secondaryVal ? `<span class="text-sm text-gray-700 font-light">${secondaryVal}</span>` : ''}`;
+            itemEl.classList.remove('fade-in');
+            void itemEl.offsetWidth; 
+            itemEl.classList.add('fade-in');
+        }
+
+        function generateData() {
+            const container = document.getElementById('gameContainer');
+            container.innerHTML = '';
+            updateUIStrings();
+
+            const diff = currentConfig.difficulty;
+            const poolLength = dictionary[currentConfig.primary][diff].length;
+            const totalNeeded = currentConfig.groups * currentConfig.options;
+
+            let masterPool = [...Array(poolLength).keys()].sort(() => Math.random() - 0.5);
+            currentlyUsedIndices = [];
+            while (currentlyUsedIndices.length < totalNeeded) {
+                currentlyUsedIndices = currentlyUsedIndices.concat(masterPool);
+                masterPool = [...Array(poolLength).keys()].sort(() => Math.random() - 0.5);
+            }
+            currentlyUsedIndices = currentlyUsedIndices.slice(0, totalNeeded);
+
+            for (let i = 0; i < currentConfig.groups; i++) {
+                const cardIndices = currentlyUsedIndices.slice(i * currentConfig.options, (i + 1) * currentConfig.options);
+                container.appendChild(createCard(i, cardIndices));
             }
         }
 
-        window.onload = refreshAll;
+        function setupLanguageButtons(parentId, configKey) {
+            const buttons = document.querySelectorAll(`#${parentId} button`);
+            buttons.forEach(btn => {
+                btn.onclick = () => {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentConfig[configKey] = btn.getAttribute('data-value');
+                };
+            });
+        }
+
+        document.getElementById('settingsToggle').onclick = (e) => { e.stopPropagation(); document.getElementById('settingsModal').classList.toggle('active'); };
+        document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').classList.remove('active');
+        document.getElementById('saveSettings').onclick = () => {
+            currentConfig.difficulty = document.getElementById('difficulty').value;
+            currentConfig.groups = Math.min(Math.max(parseInt(document.getElementById('groupCount').value), 3), 13);
+            currentConfig.options = Math.min(Math.max(parseInt(document.getElementById('optionCount').value), 3), 13);
+            generateData();
+            document.getElementById('settingsModal').classList.remove('active');
+        };
+
+        document.getElementById('resetToDefault').onclick = () => {
+            currentConfig = { primary: 'zh', secondary: 'ja', difficulty: 'easy', groups: 6, options: 6 };
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('#primaryLangBtns [data-value="zh"]').classList.add('active');
+            document.querySelector('#secondaryLangBtns [data-value="ja"]').classList.add('active');
+            document.getElementById('difficulty').value = 'easy';
+            document.getElementById('groupCount').value = 6;
+            document.getElementById('optionCount').value = 6;
+        };
+
+        document.getElementById('resetAll').onclick = generateData;
+        setupLanguageButtons('primaryLangBtns', 'primary');
+        setupLanguageButtons('secondaryLangBtns', 'secondary');
+        generateData();
     </script>
 </body>
 </html>
