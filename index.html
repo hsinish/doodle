@@ -9,7 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+JP:wght@400;700&display=swap');
 
         body {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans JP", sans-serif;
         }
 
@@ -20,12 +20,13 @@
         .card {
             transition: all 0.2s ease;
             background: #ffffff;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #f1f5f9;
             min-height: 480px;
         }
 
         .card:hover {
-            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
         }
 
         .fade-in {
@@ -42,29 +43,54 @@
             font-weight: 700;
         }
 
-        /* 讓中日文包在一起的視覺樣式 */
+        /* 題目項目容器：基礎樣式 */
         .prompt-item {
-            background-color: #f8fafc;
             border-radius: 12px;
             padding: 10px 12px;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .prompt-item:hover {
-            background-color: #f1f5f9;
+        /* 數字色塊樣式 */
+        .number-badge {
+            color: #ffffff;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            flex-shrink: 0;
         }
+
+        /* 低飽和度色系定義 */
+        .theme-A { --theme-color: #e5989b; --bg-color: #fef2f2; } /* 柔粉紅 */
+        .theme-B { --theme-color: #a2d2ff; --bg-color: #f0f7ff; } /* 柔粉藍 */
+        .theme-C { --theme-color: #b7e4c7; --bg-color: #f0fdf4; } /* 柔粉綠 */
+        .theme-D { --theme-color: #ffe5b4; --bg-color: #fffbeb; } /* 柔粉黃 */
+        .theme-E { --theme-color: #ffc8dd; --bg-color: #fff1f2; } /* 柔粉橘紅 */
+        .theme-F { --theme-color: #cdb4db; --bg-color: #faf5ff; } /* 柔粉紫 */
+
+        .theme-border { border-top-color: var(--theme-color) !important; }
+        .theme-text { color: var(--theme-color) !important; }
+        .theme-item-bg { background-color: var(--bg-color); }
+        .theme-badge-bg { background-color: var(--theme-color); }
     </style>
 </head>
 <body class="p-4 md:p-6">
 
     <div class="max-w-[1800px] mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-            <h1 class="kids-title text-4xl md:text-5xl text-indigo-900 flex items-center gap-3">
+            <h1 class="kids-title text-4xl md:text-5xl text-slate-700 flex items-center gap-3">
                 🎨 Doodle
             </h1>
             <button 
                 onclick="refreshAll()"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold py-3 px-10 rounded-full shadow-md transform active:scale-95 transition-all"
+                class="bg-slate-700 hover:bg-slate-800 text-white text-base font-bold py-3 px-10 rounded-full shadow-sm transform active:scale-95 transition-all"
             >
                 🎲 重置 A-F 全部題目
             </button>
@@ -77,7 +103,7 @@
 
     <script>
         const config = [
-            { id: "A", icon: "🔴", color: "border-red-500", titleColor: "text-red-600", 
+            { id: "A", theme: "theme-A",
               pool: [
                 { ch: "西瓜", jp: "スイカ" },
                 { ch: "城堡", jp: "おしろ" },
@@ -91,7 +117,7 @@
                 { ch: "甜甜圈", jp: "ドーナツ" }
               ]
             },
-            { id: "B", icon: "🔵", color: "border-blue-500", titleColor: "text-blue-600", 
+            { id: "B", theme: "theme-B",
               pool: [
                 { ch: "怪獸", jp: "モンスター" },
                 { ch: "星星", jp: "ほし" },
@@ -105,7 +131,7 @@
                 { ch: "鋼琴", jp: "ピアノ" }
               ]
             },
-            { id: "C", icon: "🟢", color: "border-green-500", titleColor: "text-green-600", 
+            { id: "C", theme: "theme-C",
               pool: [
                 { ch: "獨角獸", jp: "ユニコーン" },
                 { ch: "鱷魚", jp: "ワニ" },
@@ -119,7 +145,7 @@
                 { ch: "長頸鹿", jp: "キリン" }
               ]
             },
-            { id: "D", icon: "🟡", color: "border-yellow-500", titleColor: "text-yellow-600", 
+            { id: "D", theme: "theme-D",
               pool: [
                 { ch: "花朵", jp: "はな" },
                 { ch: "山脈", jp: "やま" },
@@ -133,7 +159,7 @@
                 { ch: "樹枝", jp: "えだ" }
               ]
             },
-            { id: "E", icon: "🟠", color: "border-orange-500", titleColor: "text-orange-600", 
+            { id: "E", theme: "theme-E",
               pool: [
                 { ch: "鬧鐘", jp: "とけい" },
                 { ch: "鞋子", jp: "くつ" },
@@ -147,7 +173,7 @@
                 { ch: "氣球", jp: "ふうせん" }
               ]
             },
-            { id: "F", icon: "🟣", color: "border-purple-500", titleColor: "text-purple-600", 
+            { id: "F", theme: "theme-F",
               pool: [
                 { ch: "女王", jp: "じょおう" },
                 { ch: "帽子", jp: "ぼうし" },
@@ -172,18 +198,17 @@
             const topics = shuffle([...group.pool]).slice(0, 6);
             
             const card = document.createElement('div');
-            card.className = `card border-t-8 ${group.color} rounded-2xl p-5 shadow-sm fade-in relative flex flex-col`;
+            card.className = `card border-t-8 theme-border ${group.theme} rounded-2xl p-5 fade-in relative flex flex-col`;
             card.id = `group-${index}`;
 
             const header = `
                 <div class="flex justify-between items-center mb-6 px-1">
                     <div class="flex items-center gap-3">
-                        <span class="text-3xl font-black ${group.titleColor}">${group.id}</span>
-                        <span class="text-xl opacity-60">${group.icon}</span>
+                        <span class="text-3xl font-black theme-text">${group.id}</span>
                     </div>
                     <button 
                         onclick="refreshOne(${index})"
-                        class="text-slate-300 hover:text-indigo-600 transition-colors text-2xl font-bold"
+                        class="text-slate-200 hover:text-slate-400 transition-colors text-2xl font-bold"
                         title="更換此組"
                     >
                         ↻
@@ -194,11 +219,11 @@
             const list = `
                 <div class="flex flex-col gap-3 flex-grow">
                     ${topics.map((t, i) => `
-                        <div class="prompt-item flex items-center gap-3">
-                            <span class="text-xs font-black text-slate-400 w-4">${i + 1}</span>
-                            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0">
-                                <span class="text-lg font-bold text-slate-800">${t.ch}</span>
-                                <span class="jp-text text-sm text-indigo-500">${t.jp}</span>
+                        <div class="prompt-item theme-item-bg">
+                            <div class="number-badge theme-badge-bg">${i + 1}</div>
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-0">
+                                <span class="text-lg font-bold text-slate-700">${t.ch}</span>
+                                <span class="jp-text text-lg text-slate-500">${t.jp}</span>
                             </div>
                         </div>
                     `).join('')}
