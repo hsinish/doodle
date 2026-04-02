@@ -38,11 +38,16 @@
         .card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: var(--card-bg);
-            min-height: 480px; 
+            /* 微調最小高度，確保在平板上也能一次看完 */
+            min-height: 420px; 
             position: relative;
             overflow: hidden;
             padding-left: 3rem !important;
             padding-right: 3rem !important;
+        }
+
+        @media (min-height: 800px) {
+            .card { min-height: 480px; }
         }
 
         .card:hover {
@@ -68,7 +73,7 @@
 
         .ch-text {
             font-weight: 700;
-            font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+            font-size: clamp(0.85rem, 1.1vw, 1.05rem);
             color: #1a1a1a;
             margin-bottom: 1px;
         }
@@ -76,7 +81,7 @@
         .jp-text {
             font-family: 'Noto Sans JP', sans-serif;
             font-weight: 300;
-            font-size: clamp(0.85rem, 1vw, 0.95rem);
+            font-size: clamp(0.75rem, 1vw, 0.9rem);
             color: #4b5563;
         }
 
@@ -87,7 +92,7 @@
             align-items: center;
             gap: 12px;
             border-radius: 10px;
-            margin-bottom: 6px;
+            margin-bottom: 4px; /* 稍微縮小間距 */
             transition: background-color 0.2s;
             width: 100%;
         }
@@ -154,31 +159,31 @@
 
         @media (max-width: 1280px) {
             .card { 
-                padding-left: 2.5rem !important; 
-                padding-right: 2.5rem !important; 
-                min-height: 440px;
+                padding-left: 2.2rem !important; 
+                padding-right: 2.2rem !important; 
             }
             .options-wrapper { padding: 0; }
         }
     </style>
 </head>
-<body class="p-6 lg:p-8">
+<body class="p-4 lg:p-8">
 
     <div class="max-w-[1920px] mx-auto">
-        <header class="flex flex-row justify-between items-center mb-8">
-            <!-- 已將 DOODLE 字體改為 Permanent Marker -->
-            <h1 class="handwritten-title text-4xl md:text-6xl text-black tracking-widest">
+        <header class="flex flex-row justify-between items-center mb-6">
+            <!-- 縮小標題字體大小，從 text-4xl/6xl 改為 text-2xl/4xl -->
+            <h1 class="handwritten-title text-2xl md:text-4xl text-black tracking-widest">
                 ♣ DOODLE ♥
             </h1>
             <button 
                 onclick="refreshAll()"
-                class="btn-refresh font-bold py-2.5 px-8 rounded-full transform active:scale-95 shadow-md text-sm md:text-base"
+                class="btn-refresh font-bold py-2 px-6 rounded-full transform active:scale-95 shadow-md text-xs md:text-sm"
             >
                 重置全部
             </button>
         </header>
 
-        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <!-- 調整 Grid 佈局：md(平板) 設為 3 欄，xl(桌面) 設為 6 欄 -->
+        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 lg:gap-4">
             <!-- 由 JS 生成 -->
         </div>
     </div>
@@ -249,7 +254,7 @@
             `;
 
             const list = `
-                <div class="options-wrapper flex flex-col space-y-1.5">
+                <div class="options-wrapper flex flex-col space-y-1">
                     ${topics.map((t, i) => `
                         <div class="prompt-item">
                             ${getClubBadge(i + 1)}
