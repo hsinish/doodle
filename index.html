@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 創意畫畫題目產生器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+JP:wght@400;700&display=swap');
+
+        body {
+            background-color: #f8fafc;
+            font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans JP", sans-serif;
+        }
+
+        .kids-title {
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+
+        .card {
+            transition: all 0.2s ease;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            min-height: 520px;
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 20px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .jp-text {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <div class="max-w-[1800px] mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <h1 class="kids-title text-3xl md:text-4xl text-slate-800 flex items-center gap-2">
+                🎨 畫畫靈感實驗室
+            </h1>
+            <button 
+                onclick="refreshAll()"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold py-2.5 px-8 rounded-lg shadow-sm transform active:scale-95 transition-all"
+            >
+                🎲 重置全部 A-F 組
+            </button>
+        </header>
+
+        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+            <!-- JavaScript 會在此插入卡片 -->
+        </div>
+    </div>
+
+    <script>
+        const config = [
+            { id: "A", icon: "🔴", color: "border-red-500", titleColor: "text-red-600", 
+              pool: [
+                { ch: "西瓜", jp: "スイカ" },
+                { ch: "城堡", jp: "おしろ" },
+                { ch: "漢堡", jp: "ハンバーガー" },
+                { ch: "拉麵", jp: "ラーメン" },
+                { ch: "爆米花", jp: "ポップコーン" },
+                { ch: "壽司", jp: "スシ" },
+                { ch: "草莓", jp: "イチゴ" },
+                { ch: "披薩", jp: "ピザ" },
+                { ch: "蛋糕", jp: "ケーキ" },
+                { ch: "甜甜圈", jp: "ドーナツ" }
+              ]
+            },
+            { id: "B", icon: "🔵", color: "border-blue-500", titleColor: "text-blue-600", 
+              pool: [
+                { ch: "怪獸", jp: "モンスター" },
+                { ch: "星星", jp: "ほし" },
+                { ch: "月亮", jp: "つき" },
+                { ch: "巴士", jp: "バス" },
+                { ch: "土星", jp: "どせい" },
+                { ch: "噴泉", jp: "ふんすい" },
+                { ch: "彗星", jp: "すいせい" },
+                { ch: "黑洞", jp: "ブラックホール" },
+                { ch: "披風", jp: "マント" },
+                { ch: "鋼琴", jp: "ピアノ" }
+              ]
+            },
+            { id: "C", icon: "🟢", color: "border-green-500", titleColor: "text-green-600", 
+              pool: [
+                { ch: "獨角獸", jp: "ユニコーン" },
+                { ch: "鱷魚", jp: "ワニ" },
+                { ch: "恐龍", jp: "きょうりゅう" },
+                { ch: "貓咪", jp: "ねこ" },
+                { ch: "小狗", jp: "いぬ" },
+                { ch: "大象", jp: "ぞう" },
+                { ch: "變色龍", jp: "カメレオン" },
+                { ch: "企鵝", jp: "ペンギン" },
+                { ch: "河馬", jp: "カバ" },
+                { ch: "長頸鹿", jp: "キリン" }
+              ]
+            },
+            { id: "D", icon: "🟡", color: "border-yellow-500", titleColor: "text-yellow-600", 
+              pool: [
+                { ch: "花朵", jp: "はな" },
+                { ch: "山脈", jp: "やま" },
+                { ch: "雨滴", jp: "あめ" },
+                { ch: "迷宮", jp: "めいろ" },
+                { ch: "森林", jp: "もり" },
+                { ch: "蘑菇", jp: "きのこ" },
+                { ch: "太陽", jp: "たいよう" },
+                { ch: "糖果", jp: "キャンディ" },
+                { ch: "雲朵", jp: "くも" },
+                { ch: "樹枝", jp: "えだ" }
+              ]
+            },
+            { id: "E", icon: "🟠", color: "border-orange-500", titleColor: "text-orange-600", 
+              pool: [
+                { ch: "鬧鐘", jp: "とけい" },
+                { ch: "鞋子", jp: "くつ" },
+                { ch: "鉛筆", jp: "えんぴつ" },
+                { ch: "雨傘", jp: "かさ" },
+                { ch: "書本", jp: "ほん" },
+                { ch: "牙刷", jp: "ハブラシ" },
+                { ch: "電視", jp: "テレビ" },
+                { ch: "湯勺", jp: "スプーン" },
+                { ch: "眼鏡", jp: "めがね" },
+                { ch: "氣球", jp: "ふうせん" }
+              ]
+            },
+            { id: "F", icon: "🟣", color: "border-purple-500", titleColor: "text-purple-600", 
+              pool: [
+                { ch: "女王", jp: "じょおう" },
+                { ch: "帽子", jp: "ぼうし" },
+                { ch: "背包", jp: "リュック" },
+                { ch: "手套", jp: "てぶくろ" },
+                { ch: "頭盔", jp: "ヘルメット" },
+                { ch: "寶箱", jp: "たからばこ" },
+                { ch: "靴子", jp: "ブーツ" },
+                { ch: "手錶", jp: "うでどけい" },
+                { ch: "戒指", jp: "ゆびわ" },
+                { ch: "電筒", jp: "ライト" }
+              ]
+            }
+        ];
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function generateCard(index) {
+            const group = config[index];
+            const topics = shuffle([...group.pool]).slice(0, 6);
+            
+            const card = document.createElement('div');
+            card.className = `card border-t-4 ${group.color} rounded-xl p-5 shadow-sm fade-in relative flex flex-col`;
+            card.id = `group-${index}`;
+
+            const header = `
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-black ${group.titleColor}">Group ${group.id}</span>
+                        <span class="text-lg opacity-80">${group.icon}</span>
+                    </div>
+                    <button 
+                        onclick="refreshOne(${index})"
+                        class="text-slate-300 hover:text-indigo-600 transition-colors text-xl font-bold"
+                        title="更換此組"
+                    >
+                        ↻
+                    </button>
+                </div>
+            `;
+
+            const list = `
+                <div class="flex flex-col gap-6 flex-grow">
+                    ${topics.map((t, i) => `
+                        <div class="flex items-start gap-2">
+                            <span class="text-sm font-bold text-slate-300 mt-1.5">${i + 1}.</span>
+                            <div class="flex flex-col">
+                                <span class="text-lg font-bold text-slate-800 leading-tight">${t.ch}</span>
+                                <span class="jp-text text-sm text-indigo-500 mt-1">${t.jp}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            card.innerHTML = header + list;
+            return card;
+        }
+
+        function refreshOne(index) {
+            const grid = document.getElementById('grid');
+            const oldCard = document.getElementById(`group-${index}`);
+            const newCard = generateCard(index);
+            grid.replaceChild(newCard, oldCard);
+        }
+
+        function refreshAll() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < config.length; i++) {
+                grid.appendChild(generateCard(i));
+            }
+        }
+
+        window.onload = refreshAll;
+    </script>
+</body>
+</html>
