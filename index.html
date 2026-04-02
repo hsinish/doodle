@@ -24,7 +24,7 @@
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             background: #ffffff;
             border: 1px solid #e8e4de;
-            min-height: 440px; /* 略微調低高度以適應緊湊佈局 */
+            min-height: 400px;
         }
 
         .card:hover {
@@ -44,30 +44,29 @@
         .jp-text {
             font-family: 'Noto Sans JP', sans-serif;
             font-weight: 500;
+            word-break: break-all; /* 確保長文字不超出 */
         }
 
         .prompt-item {
-            border-radius: 10px; /* 稍微縮小圓角 */
-            padding: 8px 10px; /* 縮小內距 */
+            border-radius: 8px;
+            padding: 6px 8px; /* 極大化內部空間 */
             display: flex;
             align-items: center;
-            gap: 10px; /* 縮小間距 */
+            gap: 8px;
             transition: all 0.2s;
-            overflow: hidden;
         }
 
         .number-badge {
             color: #ffffff;
-            width: 44px; /* 縮小寬度 */
-            height: 28px; /* 縮小高度 */
+            width: 40px; /* 進一步縮減標籤寬度 */
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
+            border-radius: 5px;
             font-weight: 700;
-            font-size: 0.85rem; /* 縮小字體 */
+            font-size: 0.8rem;
             flex-shrink: 0;
-            gap: 1px;
             letter-spacing: -0.5px;
         }
 
@@ -95,10 +94,10 @@
         }
     </style>
 </head>
-<body class="p-6 md:p-10">
+<body class="p-4 md:p-8 lg:p-10">
 
     <div class="max-w-[1800px] mx-auto">
-        <header class="flex flex-row justify-between items-center mb-12 gap-4">
+        <header class="flex flex-row justify-between items-center mb-8 md:mb-12 gap-4">
             <div class="flex flex-col items-start">
                 <h1 class="kids-title text-4xl md:text-5xl text-stone-600 flex items-center gap-3">
                     🎨 Doodle
@@ -106,13 +105,14 @@
             </div>
             <button 
                 onclick="refreshAll()"
-                class="btn-refresh text-white text-sm md:text-base font-bold py-3 px-6 md:px-10 rounded-xl transform active:scale-95 transition-all shadow-md"
+                class="btn-refresh text-white text-xs md:text-base font-bold py-2.5 px-5 md:py-4 md:px-10 rounded-xl transform active:scale-95 transition-all shadow-md"
             >
                 🎲 重置全部
             </button>
         </header>
 
-        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-5">
+        <!-- 縮小 gap-5 到 gap-3 -->
+        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
             <!-- 卡片由 JavaScript 自動生成 -->
         </div>
     </div>
@@ -163,11 +163,12 @@
             const topics = shuffle([...group.pool]).slice(0, 6);
             
             const card = document.createElement('div');
-            card.className = `card border-t-[8px] theme-border ${group.theme} rounded-[24px] p-5 fade-in relative flex flex-col`;
+            // 縮小 p-5 到 p-4 增加內容寬度
+            card.className = `card border-t-[8px] theme-border ${group.theme} rounded-[20px] p-4 fade-in relative flex flex-col`;
             card.id = `group-${index}`;
 
             const header = `
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-4">
                     <span class="text-2xl font-black theme-text tracking-tighter">${group.id}</span>
                     <button 
                         onclick="refreshOne(${index})"
@@ -180,13 +181,13 @@
             `;
 
             const list = `
-                <div class="flex flex-col gap-2.5 flex-grow">
+                <div class="flex flex-col gap-2 flex-grow">
                     ${topics.map((t, i) => `
-                        <div class="prompt-item theme-item-bg flex-nowrap">
+                        <div class="prompt-item theme-item-bg">
                             <div class="number-badge theme-badge-bg">${clubIcons[i]}</div>
-                            <div class="flex flex-col overflow-hidden">
-                                <span class="text-[15px] xl:text-[16px] font-bold text-stone-600 leading-tight whitespace-nowrap">${t.ch}</span>
-                                <span class="jp-text text-[11px] xl:text-[12px] text-stone-400 mt-0.5 whitespace-nowrap">${t.jp}</span>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-[14px] md:text-[15px] font-bold text-stone-600 leading-tight">${t.ch}</span>
+                                <span class="jp-text text-[10px] md:text-[11px] text-stone-400 mt-0.5">${t.jp}</span>
                             </div>
                         </div>
                     `).join('')}
