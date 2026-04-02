@@ -3,156 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎨 Doodle - 舒緩奶油風創意畫畫題目產生器</title>
+    <title>♣️ Doodle - 撲克牌畫畫題目產生器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+JP:wght@400;700&display=swap');
+        /* 引入手寫字體 Permanent Marker */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;700&family=Noto+Serif+TC:wght@900&family=Permanent+Marker&display=swap');
+
+        :root {
+            --bg-color: #e5e5e5;
+            --card-bg: #ffffff;
+            --item-bg: #f8f8f8;
+            --item-hover: #f0f0f0;
+            --poker-red: #d40000;
+        }
 
         body {
-            background-color: #f5f2ed; /* 暖米色背景 */
-            color: #6b665f;
+            background-color: var(--bg-color);
+            color: #1a1a1a;
             font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans JP", sans-serif;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
 
-        .kids-title {
-            font-family: 'ZCOOL KuaiLe', cursive;
+        .poker-serif {
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        /* 手寫風格標題字體 */
+        .handwritten-title {
+            font-family: 'Permanent Marker', cursive;
         }
 
         .card {
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            background: #ffffff;
-            border: 1px solid #e8e4de;
-            min-height: 400px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-bg);
+            min-height: 480px; 
+            position: relative;
+            overflow: hidden;
+            padding-left: 3rem !important;
+            padding-right: 3rem !important;
         }
 
         .card:hover {
-            box-shadow: 0 15px 30px -10px rgba(107, 102, 95, 0.1);
-            transform: translateY(-4px);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
         }
 
         .fade-in {
-            animation: fadeIn 0.6s ease-out forwards;
+            animation: fadeIn 0.5s ease-out forwards;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.1;
+        }
+
+        .ch-text {
+            font-weight: 700;
+            font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+            color: #1a1a1a;
+            margin-bottom: 1px;
         }
 
         .jp-text {
             font-family: 'Noto Sans JP', sans-serif;
-            font-weight: 500;
-            word-break: break-all; /* 確保長文字不超出 */
+            font-weight: 300;
+            font-size: clamp(0.85rem, 1vw, 0.95rem);
+            color: #4b5563;
         }
 
         .prompt-item {
-            border-radius: 8px;
-            padding: 6px 8px; /* 極大化內部空間 */
+            background-color: var(--item-bg);
+            padding: 8px 12px; 
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
+            gap: 12px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+        
+        .prompt-item:hover {
+            background-color: var(--item-hover);
         }
 
-        .number-badge {
+        .heart-red {
+            color: var(--poker-red);
+        }
+
+        .btn-refresh {
+            background-color: #1a1a1a;
             color: #ffffff;
-            width: 40px; /* 進一步縮減標籤寬度 */
-            height: 26px;
+            transition: all 0.2s;
+        }
+        .btn-refresh:hover {
+            background-color: #404040;
+        }
+
+        .club-grid {
+            width: 32px;
+            height: 42px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            flex-shrink: 0;
+            background: #ffffff;
+            border-radius: 4px;
+            padding: 2px;
+        }
+        .club-symbol {
+            font-size: 9px;
+            color: #000000;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 5px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-            letter-spacing: -0.5px;
+            line-height: 1;
         }
 
-        /* 舒緩配色系統 */
-        .theme-A { --theme-color: #d9a7a7; --bg-color: #fdf6f6; } 
-        .theme-B { --theme-color: #a7c1d9; --bg-color: #f6f9fd; } 
-        .theme-C { --theme-color: #a3c49a; --bg-color: #f6faf4; } 
-        .theme-D { --theme-color: #d9c5a7; --bg-color: #fdf9f6; } 
-        .theme-E { --theme-color: #c1a7d9; --bg-color: #f9f6fd; } 
-        .theme-F { --theme-color: #9abec4; --bg-color: #f4fafb; } 
-
-        .theme-border { border-top-color: var(--theme-color) !important; }
-        .theme-text { color: var(--theme-color) !important; filter: brightness(0.85); }
-        .theme-item-bg { background-color: var(--bg-color); }
-        .theme-badge-bg { background-color: var(--theme-color); }
-
-        .btn-refresh {
-            background-color: #8a8279;
-            transition: all 0.3s;
-            white-space: nowrap;
+        .poker-corner {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 0.85;
+            font-weight: 900;
+            z-index: 10;
         }
-        .btn-refresh:hover {
-            background-color: #706961;
-            box-shadow: 0 4px 12px rgba(138, 130, 121, 0.2);
+        .corner-top { top: 8px; left: 8px; }
+        .corner-bottom { 
+            bottom: 8px; 
+            right: 8px; 
+            transform: rotate(180deg); 
+        }
+
+        .options-wrapper {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            padding: 0 0.5rem;
+        }
+
+        @media (max-width: 1280px) {
+            .card { 
+                padding-left: 2.5rem !important; 
+                padding-right: 2.5rem !important; 
+                min-height: 440px;
+            }
+            .options-wrapper { padding: 0; }
         }
     </style>
 </head>
-<body class="p-4 md:p-8 lg:p-10">
+<body class="p-6 lg:p-8">
 
-    <div class="max-w-[1800px] mx-auto">
-        <header class="flex flex-row justify-between items-center mb-8 md:mb-12 gap-4">
-            <div class="flex flex-col items-start">
-                <h1 class="kids-title text-4xl md:text-5xl text-stone-600 flex items-center gap-3">
-                    🎨 Doodle
-                </h1>
-            </div>
+    <div class="max-w-[1920px] mx-auto">
+        <header class="flex flex-row justify-between items-center mb-8">
+            <!-- 已將 DOODLE 字體改為 Permanent Marker -->
+            <h1 class="handwritten-title text-4xl md:text-6xl text-black tracking-widest">
+                ♣ DOODLE ♥
+            </h1>
             <button 
                 onclick="refreshAll()"
-                class="btn-refresh text-white text-xs md:text-base font-bold py-2.5 px-5 md:py-4 md:px-10 rounded-xl transform active:scale-95 transition-all shadow-md"
+                class="btn-refresh font-bold py-2.5 px-8 rounded-full transform active:scale-95 shadow-md text-sm md:text-base"
             >
-                🎲 重置全部
+                重置全部
             </button>
         </header>
 
-        <!-- 縮小 gap-5 到 gap-3 -->
-        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-            <!-- 卡片由 JavaScript 自動生成 -->
+        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            <!-- 由 JS 生成 -->
         </div>
     </div>
 
     <script>
-        const clubIcons = ["♣A", "♣2", "♣3", "♣4", "♣5", "♣6"];
-        const heartIcons = ["♥A", "♥2", "♥3", "♥4", "♥5", "♥6"];
+        const clubLayouts = {
+            1: [4],
+            2: [1, 7],
+            3: [1, 4, 7],
+            4: [0, 2, 6, 8],
+            5: [0, 2, 4, 6, 8],
+            6: [0, 2, 3, 5, 6, 8]
+        };
+
+        const heartIds = ["A", "2", "3", "4", "5", "6"];
 
         const config = [
-            { id: heartIcons[0], theme: "theme-A", pool: [
-                { ch: "西瓜", jp: "スイカ" }, { ch: "城堡", jp: "おしろ" }, { ch: "漢堡", jp: "ハンバーガー" },
-                { ch: "拉麵", jp: "ラーメン" }, { ch: "爆米花", jp: "ポップコーン" }, { ch: "壽司", jp: "スシ" },
-                { ch: "草莓", jp: "イチゴ" }, { ch: "披薩", jp: "ピザ" }, { ch: "蛋糕", jp: "ケーキ" }, { ch: "甜甜圈", jp: "ドーナツ" }
-            ]},
-            { id: heartIcons[1], theme: "theme-B", pool: [
-                { ch: "怪獸", jp: "モンスター" }, { ch: "星星", jp: "ほし" }, { ch: "月亮", jp: "つき" },
-                { ch: "巴士", jp: "バス" }, { ch: "土星", jp: "どせい" }, { ch: "噴泉", jp: "ふんすい" },
-                { ch: "彗星", jp: "すいせい" }, { ch: "黑洞", jp: "ブラックホール" }, { ch: "披風", jp: "マント" }, { ch: "鋼琴", jp: "ピアノ" }
-            ]},
-            { id: heartIcons[2], theme: "theme-C", pool: [
-                { ch: "獨角獸", jp: "ユニコーン" }, { ch: "鱷魚", jp: "ワニ" }, { ch: "恐龍", jp: "きょうりゅう" },
-                { ch: "貓咪", jp: "ねこ" }, { ch: "小狗", jp: "いぬ" }, { ch: "大象", jp: "ぞう" },
-                { ch: "變色龍", jp: "カメレオン" }, { ch: "企鵝", jp: "ペンギン" }, { ch: "河馬", jp: "カバ" }, { ch: "長頸鹿", jp: "キリン" }
-            ]},
-            { id: heartIcons[3], theme: "theme-D", pool: [
-                { ch: "花朵", jp: "はな" }, { ch: "山脈", jp: "やま" }, { ch: "雨滴", jp: "あめ" },
-                { ch: "迷宮", jp: "めいろ" }, { ch: "森林", jp: "もり" }, { ch: "蘑菇", jp: "きのこ" },
-                { ch: "太陽", jp: "たいよう" }, { ch: "糖果", jp: "キャンディ" }, { ch: "雲朵", jp: "くも" }, { ch: "樹枝", jp: "えだ" }
-            ]},
-            { id: heartIcons[4], theme: "theme-E", pool: [
-                { ch: "鬧鐘", jp: "とけい" }, { ch: "鞋子", jp: "くつ" }, { ch: "鉛筆", jp: "えんぴつ" },
-                { ch: "雨傘", jp: "かさ" }, { ch: "書本", jp: "ほん" }, { ch: "牙刷", jp: "ハブラシ" },
-                { ch: "電視", jp: "テレビ" }, { ch: "湯勺", jp: "スプーン" }, { ch: "眼鏡", jp: "めがね" }, { ch: "氣球", jp: "ふうせん" }
-            ]},
-            { id: heartIcons[5], theme: "theme-F", pool: [
-                { ch: "女王", jp: "じょおう" }, { ch: "帽子", jp: "ぼうし" }, { ch: "背包", jp: "リュック" },
-                { ch: "手套", jp: "てぶくろ" }, { ch: "頭盔", jp: "ヘルメット" }, { ch: "寶箱", jp: "たからばこ" },
-                { ch: "靴子", jp: "ブーツ" }, { ch: "手錶", jp: "うでどけい" }, { ch: "戒指", jp: "ゆびわ" }, { ch: "電筒", jp: "ライト" }
-            ]}
+            { id: heartIds[0], pool: [{ ch: "西瓜", jp: "スイカ" }, { ch: "城堡", jp: "おしろ" }, { ch: "漢堡", jp: "ハンバーガー" }, { ch: "拉麵", jp: "ラーメン" }, { ch: "爆米花", jp: "ポップコーン" }, { ch: "壽司", jp: "スシ" }, { ch: "草莓", jp: "イチゴ" }, { ch: "披薩", jp: "ピザ" }, { ch: "蛋糕", jp: "ケーキ" }, { ch: "甜甜圈", jp: "ドーナツ" }] },
+            { id: heartIds[1], pool: [{ ch: "怪獸", jp: "モンスター" }, { ch: "星星", jp: "ほし" }, { ch: "月亮", jp: "つき" }, { ch: "巴士", jp: "バス" }, { ch: "土星", jp: "どせい" }, { ch: "噴泉", jp: "ふんすい" }, { ch: "彗星", jp: "すいせい" }, { ch: "黑洞", jp: "ブラックホール" }, { ch: "披風", jp: "マント" }, { ch: "鋼琴", jp: "ピアノ" }] },
+            { id: heartIds[2], pool: [{ ch: "獨角獸", jp: "ユニコーン" }, { ch: "鱷魚", jp: "ワニ" }, { ch: "恐龍", jp: "きょうりゅう" }, { ch: "貓咪", jp: "ねこ" }, { ch: "小狗", jp: "いぬ" }, { ch: "大象", jp: "ぞう" }, { ch: "變色龍", jp: "カメレオン" }, { ch: "企鵝", jp: "ペンギン" }, { ch: "河馬", jp: "カバ" }, { ch: "長頸鹿", jp: "キリン" }] },
+            { id: heartIds[3], pool: [{ ch: "花朵", jp: "はな" }, { ch: "山脈", jp: "やま" }, { ch: "雨滴", jp: "あめ" }, { ch: "迷宮", jp: "めいろ" }, { ch: "森林", jp: "もり" }, { ch: "蘑菇", jp: "きのこ" }, { ch: "太陽", jp: "たいよう" }, { ch: "糖果", jp: "キャンディ" }, { ch: "雲朵", jp: "くも" }, { ch: "樹枝", jp: "えだ" }] },
+            { id: heartIds[4], pool: [{ ch: "鬧鐘", jp: "とけい" }, { ch: "鞋子", jp: "くつ" }, { ch: "鉛筆", jp: "えんぴつ" }, { ch: "雨傘", jp: "かさ" }, { ch: "書本", jp: "ほん" }, { ch: "牙刷", jp: "ハブラシ" }, { ch: "電視", jp: "テレビ" }, { ch: "湯勺", jp: "スプーン" }, { ch: "眼鏡", jp: "めがね" }, { ch: "氣球", jp: "ふうせん" }] },
+            { id: heartIds[5], pool: [{ ch: "女王", jp: "じょおう" }, { ch: "帽子", jp: "ぼうし" }, { ch: "背包", jp: "リュック" }, { ch: "手套", jp: "てぶくろ" }, { ch: "頭盔", jp: "ヘルメット" }, { ch: "寶箱", jp: "たからばこ" }, { ch: "靴子", jp: "ブーツ" }, { ch: "手錶", jp: "うでどけい" }, { ch: "戒指", jp: "ゆびわ" }, { ch: "電筒", jp: "ライト" }] }
         ];
+
+        function getClubBadge(num) {
+            const layout = clubLayouts[num];
+            let cells = Array(9).fill('');
+            layout.forEach(idx => cells[idx] = '♣');
+            
+            return `
+                <div class="club-grid">
+                    ${cells.map(cell => `<div class="club-symbol">${cell}</div>`).join('')}
+                </div>
+            `;
+        }
 
         function shuffle(array) {
             return array.sort(() => Math.random() - 0.5);
@@ -163,38 +225,44 @@
             const topics = shuffle([...group.pool]).slice(0, 6);
             
             const card = document.createElement('div');
-            // 縮小 p-5 到 p-4 增加內容寬度
-            card.className = `card border-t-[8px] theme-border ${group.theme} rounded-[20px] p-4 fade-in relative flex flex-col`;
+            card.className = `card rounded-xl fade-in flex flex-col justify-center`;
             card.id = `group-${index}`;
 
-            const header = `
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-2xl font-black theme-text tracking-tighter">${group.id}</span>
-                    <button 
-                        onclick="refreshOne(${index})"
-                        class="text-stone-200 hover:text-stone-400 transition-colors text-xl"
-                        title="換一組"
-                    >
-                        ↻
-                    </button>
+            const cornerHTML = `
+                <div class="poker-corner corner-top heart-red">
+                    <span class="text-3xl poker-serif font-black">${group.id}</span>
+                    <span class="text-xl">♥</span>
+                </div>
+                <div class="poker-corner corner-bottom heart-red">
+                    <span class="text-3xl poker-serif font-black">${group.id}</span>
+                    <span class="text-xl">♥</span>
                 </div>
             `;
 
+            const refreshBtn = `
+                <button 
+                    onclick="refreshOne(${index})"
+                    class="absolute top-3 right-3 text-gray-200 hover:text-black transition-colors z-20"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </button>
+            `;
+
             const list = `
-                <div class="flex flex-col gap-2 flex-grow">
+                <div class="options-wrapper flex flex-col space-y-1.5">
                     ${topics.map((t, i) => `
-                        <div class="prompt-item theme-item-bg">
-                            <div class="number-badge theme-badge-bg">${clubIcons[i]}</div>
-                            <div class="flex flex-col min-w-0">
-                                <span class="text-[14px] md:text-[15px] font-bold text-stone-600 leading-tight">${t.ch}</span>
-                                <span class="jp-text text-[10px] md:text-[11px] text-stone-400 mt-0.5">${t.jp}</span>
+                        <div class="prompt-item">
+                            ${getClubBadge(i + 1)}
+                            <div class="text-container">
+                                <span class="ch-text">${t.ch}</span>
+                                <span class="jp-text">${t.jp}</span>
                             </div>
                         </div>
                     `).join('')}
                 </div>
             `;
 
-            card.innerHTML = header + list;
+            card.innerHTML = cornerHTML + refreshBtn + list;
             return card;
         }
 
